@@ -1,9 +1,11 @@
 from tkinter import *
+from tkinter import messagebox
 import mysql.connector as sqLtor
 
 #===================GLOBAL VARIABLES================================
 fromd = ''
 tod = ''
+dat = None
 
 #====================SQL CONNECTION=================================
 mycon =sqLtor.connect(host = "localhost", user = "root", passwd = "2005", database =  "proj")
@@ -15,10 +17,6 @@ if mycon.is_connected():
 
 
 def book(fromd,tod,val):
-    
-       
-    
-    
     def confirm():
         name = entry0.get()
         no = entry1.get()
@@ -34,6 +32,11 @@ def book(fromd,tod,val):
         entry3.delete(0,END)
         entry4.delete(0,END) 
  
+
+
+
+
+
 
 
     window = Tk()
@@ -66,6 +69,13 @@ def book(fromd,tod,val):
         x = 177, y = 161,
         width = 149,
         height = 25)
+
+
+
+
+
+
+
 
 
 
@@ -178,9 +188,15 @@ def book(fromd,tod,val):
 
 
 def con(name,no,contact,gen,em,fromd,tod,val):
-   
-    co = Tk()
     
+    def booktic(name,no,contact,gen,em,fromd,val):
+        #=============enter here===================
+        messagebox.showinfo("showinfo","Ticket Booked")
+        print("Booked")
+        
+    
+    co = Tk()
+    print(val)
     co.geometry("842x463")
     co.configure(bg = "#ffffff")
     canvas = Canvas(
@@ -203,6 +219,8 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         width = 149,
         height = 25)
 
+    entry0.insert(0,name)
+
 
 
     entry1 = Entry(
@@ -212,6 +230,8 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         x = 553, y = 106,
         width = 149,
         height = 25)
+
+    entry1.insert(0,fromd)
 
 
 
@@ -223,6 +243,7 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         width = 149,
         height = 25)
 
+    entry2.insert(0,no)
 
 
     entry3 = Entry(
@@ -233,6 +254,7 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         width = 149,
         height = 25)
 
+    entry3.insert(0,tod)
 
     entry4 = Entry(
         bg = "#fcfcfc")
@@ -241,6 +263,8 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         x = 177, y = 225,
         width = 149,
         height = 25)
+
+    entry4.insert(0,contact)
 
 
 
@@ -252,7 +276,18 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         width = 149,
         height = 25)
 
-
+#=============CALCULATE FARE PRICE===============================
+    
+    if val == 3:
+        price = 3500
+    elif val == 2:
+        price = 750
+    elif val == 1:
+        price = 250
+    x = int(no) 
+    fp = x * price
+    entry5.insert(0,fp) 
+#================================================================
 
     entry6 = Entry(
         bg = "#fcfcfc")
@@ -262,6 +297,7 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         width = 149,
         height = 25)
 
+    entry6.insert(0,gen)
 
 
     entry7 = Entry(
@@ -272,7 +308,9 @@ def con(name,no,contact,gen,em,fromd,tod,val):
         width = 149,
         height = 25)
 
-    entry0.insert(0,name)
+    entry7.insert(0,em)
+
+    
 
 
     canvas.create_text(
@@ -289,6 +327,7 @@ def con(name,no,contact,gen,em,fromd,tod,val):
 
     b0 = Button(
         text = "Book Tickets",
+        command=lambda:booktic(name,no,contact,gen,em,fromd,val),
         relief = "flat")
 
     b0.place(
@@ -347,25 +386,9 @@ def con(name,no,contact,gen,em,fromd,tod,val):
     co.resizable(False, False)
     co.mainloop()
 
-    entry1.insert(0,fromd)
-    entry2.insert(0,no)
-    entry6.insert(0,gen)
-    entry7.insert(0,em)
-    entry3.insert(0,tod)
-    entry4.insert(0,contact)
-    if val == 3:
-        price = 3500
-    elif val == 2:
-        price = 750
-    elif val == 1:
-        price = 250
-    x = int(val) 
-    fp = x * price
-    entry5.insert(0,fp)       
-
 #==========================CALL FUNCTIONS==========================================
 def train(): 
-            
+            global dat
             fromd = entry0.get()
             tod = entry2.get()
             ct = mycon.cursor()
@@ -379,11 +402,10 @@ def train():
                     tname = i[1]
                     time = i[7]
                     entry1.insert(END,f'\n\n{tname}\t\t\t{time}')
-               
-                    
-                     
-                     
+                    dat = i
+                                      
 def flight():  
+            global dat
             fromd = entry0.get()
             tod = entry2.get()
             ct = mycon.cursor()
@@ -397,10 +419,10 @@ def flight():
                      tname = i[1]
                      time = i[6]
                      entry1.insert(END,f'\n\n{tname}\t\t\t{time}')
-                     
-                     
-                     
+                     dat = i
+                                      
 def bus():  
+            global dat
             fromd = entry0.get()
             tod = entry2.get()
             ct = mycon.cursor()
@@ -414,16 +436,18 @@ def bus():
                      tname = i[1]
                      time = i[5]
                      entry1.insert(END,f'\n\n{tname}\t\t\t{time}')
-                     
-                  
-
-
-def search(val):
-        fromd = entry0.get()
-        tod = entry2.get()
-        ma.destroy()
-        book(fromd,tod,val)
-              
+                     dat = i
+                    
+def search(val,dat):
+    if dat != None:
+            fromd = entry0.get()
+            tod = entry2.get()
+            ma.destroy()
+            book(fromd,tod,val)
+    elif dat == None:
+             entry1.insert(END,'\n\n\tEnter Valid Destination')
+       
+            
         
         
 #================================MAIN======================================
@@ -493,7 +517,7 @@ b0.place(
 
 b1 = Button(
     text = "Next",
-    command = lambda:search(var1.get()),
+    command = lambda:search(var1.get(),dat),
     relief = "flat")
 
 b1.place(
@@ -524,5 +548,5 @@ canvas.create_text(
 
 ma.resizable(False, False)
 ma.mainloop()
-
+#========================END==================================
 
